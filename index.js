@@ -38,13 +38,13 @@ socket.on('forwarded-command', (command) => {
 nanoPort.on('data', (data) => {
     const nanoSerialData = data.toString();
     console.log("Data Recevied from serial Port", nanoSerialData);
-    socket.emit("Data Recevied from serial Port", nanoSerialData)
+    socket.emit("Data Received from Nano", nanoSerialData)
 }
 );
 picoPort.on('data', (data) => {
     const picoSerialData = data.toString();
     console.log("Data Recevied from serial Port", picoSerialData);
-    socket.emit("Data Recevied from serial Port", picoSerialData)
+    socket.emit("Data Received from Pico", picoSerialData)
 }
 );
 
