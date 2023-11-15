@@ -1,6 +1,8 @@
 const express = require('express');
 const http = require('http');
 const io = require('socket.io-client');
+const WebSocket = require('ws');
+const { spawn } = require('child_process');
 const { SerialPort } = require('serialport');
 const nanoPort = new SerialPort({
     path: '/dev/ttyUSB0',
@@ -47,6 +49,31 @@ picoPort.on('data', (data) => {
     socket.emit("Data Received from Pico", picoSerialData)
 }
 );
+wss.on('connection', function connection(ws) {
+    console.log('Client connected for video stream');
+
+    // Spawn the libcamera process
+    const libcameraProcess = spawn('libcamera-vid', ['-t', '0', '-o', '-']);
+
+    libcameraProcess.stdout.on('data', function(data) {
+        ws.send(data, { binary: true });
+    });
+
+    libcameraProcess.stderr.on('data', function(data) {
+        console.error(`libcamera stderr: ${data}`);
+    });
+
+    libcameraProcess.on('close', function(code) {
+        console.log(`libcamera process exited with code ${code}`);
+        ws.close();
+    });
+
+    ws.on('close', function close() {
+        console.log('Client disconnected from video stream');
+        libcameraProcess.kill();
+    });
+});
+
 
 socket.on('disconnect', () => {
     console.log('Disconnected from cloud server');
