@@ -12,10 +12,6 @@ const { SerialPort } = require('serialport');
 //     path: '/dev/ttyACM0',
 //     baudRate: 115200
 // });
-// Connect to the cloud server
-
-
-
 const socket = io.connect('https://flymatics-cloud-server.onrender.com/');
 let interval;
 
